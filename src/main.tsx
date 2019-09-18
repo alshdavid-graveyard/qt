@@ -1,6 +1,15 @@
-import { Initializer } from './render';
-import { MyComponent } from './components/b.component'
+import { Initializer } from './kit';
+import { DComponent } from './components/d.component'
+import { PostService } from './service/posts.service'
+
+const postService = new PostService()
 
 Initializer
-  .useComponent(MyComponent)
+  .useComponent(DComponent)
+  .provideKeys({
+    something: 'hey'
+  })
+  .provideInstances([
+    postService
+  ])
   .attachTo(document.body)

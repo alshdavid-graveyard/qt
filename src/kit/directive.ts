@@ -27,19 +27,19 @@ interface TemplateProps {
   declarations: Record<string, any>
 }
 
-interface ComponentOptions {
+interface DirectiveOptions {
   selector: string
   declarations?: any[]
   template: (props: TemplateProps) => void
 }
 
-export function Component(options: ComponentOptions) {
+export function Directive(options: DirectiveOptions) {
   return function(constructor: any): any {
     function construct(...args: any[]) {
       const container = new Container()
       const instance = new constructor(...args)
 
-      instance.type = 'component'
+      instance.type = 'directive'
       instance.container = container
       instance.selector = options.selector
 

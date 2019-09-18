@@ -1,13 +1,14 @@
 import { h, Fragment, Component } from 'preact'
-import { useEffect } from 'preact/hooks'
+import { useEffect, useContext } from 'preact/hooks'
+import { dependencyContainer } from './injector'
 import { Subscription, BehaviorSubject, Subject } from 'rxjs'
 
 interface TemplateProps {
   template: BehaviorSubject<any>
   context: BehaviorSubject<any>
   declarations: BehaviorSubject<any>
-  onInit: () => void
-  onDestroy: () => void
+  onInit: Subject<any>
+  onDestroy: Subject<any>
 }
 
 interface TemplateState {
@@ -37,16 +38,14 @@ class Template extends Component<TemplateProps, TemplateState> {
     this.$.add(this.props.context.subscribe(
       value => this.setState({ context: value })
     ))
-    if (this.props.onInit) {
-      this.props.onInit()
-    }
+    this.props.onInit.next()
+    this.props.onInit.complete()
   }
 
   componentWillUnmount() {
     this.$.unsubscribe()
-    if (this.props.onInit) {
-      this.props.onDestroy()
-    }
+    this.props.onDestroy.next()
+    this.props.onDestroy.complete()
   }
 
   setTemplate = (template: any) => {
@@ -81,9 +80,10 @@ export class Container {
   context = new BehaviorSubject<any>({})
   declarations = new BehaviorSubject<any>({})
   props = new BehaviorSubject<any>({})  
-  propEvents = new Subject()
-  onInit = new Subject()
-  onDestroy = new Subject()
+  injectables = new BehaviorSubject<any>({})
+  propEvents = new Subject<any>()
+  onInit = new Subject<any>()
+  onDestroy = new Subject<any>()
 
   public emitPropEvent(key: string, value: any) {
     this.propEvents.next({ key, value })
@@ -109,24 +109,36 @@ export class Container {
     return this.template.value
   }
 
+  useInjectables = () => {
+    const DC = useContext(dependencyContainer)
+    useEffect(() => this.injectables.next(DC), [DC])
+  }
+
+  usePropEvents = (props) => {
+    useEffect(() => {
+      const s = this.propEvents
+        .subscribe(
+          event => props[event.key](event.value)
+        )
+      return () => s.unsubscribe()
+    }, [this.propEvents]) 
+    
+    this.props.next(props)
+  }
+
   public getComponent() {
     return (props: any) => {
-      
-      useEffect(() => {
-        const s = this.propEvents
-          .subscribe((event: any) => props[event.key](event.value))
-        return () => s.unsubscribe()
-      }, [this.propEvents]) 
+      this.useInjectables()
+      this.usePropEvents(props)     
 
-      this.props.next(props)
       return h(
         Template, 
         { 
           template: this.template, 
           context: this.context,
           declarations: this.declarations,
-          onInit: () => this.onInit.next(),
-          onDestroy: () => this.onDestroy.next(),
+          onInit: this.onInit,
+          onDestroy: this.onDestroy,
         }
       )
     }

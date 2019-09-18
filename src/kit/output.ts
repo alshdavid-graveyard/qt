@@ -1,15 +1,18 @@
+import { patchOnInit, patchOnDestroy } from './patch-method'
+import { Subscription } from 'rxjs';
+
 export function Output(options: any = {}) {
   return function (target: any, key: string) {
-    const OGOnInit = target.onInit || function () { }
+    let $: Subscription
 
-    function onInit(this: any) {
-      this[key].subscribe((value: any) => {
+    patchOnInit(target, function(this: any) {
+      $ = this[key].subscribe((value: any) => {
         this.container.emitPropEvent(key, value)
       })
+    })
 
-      OGOnInit.apply(this)
-    }
-
-    target.onInit = onInit
+    patchOnDestroy(target, function(this: any) {
+      $.unsubscribe()
+    })
   }
 }
