@@ -9,6 +9,7 @@
     "serve": "http-server -s public",
     "build": "webpack",
     "build:prod": "webpack --prod",
+    "build:stats": "webpack --prod --stats",
     "clean": "rm -rf public/app node_modules"
   },
   "keywords": [],
@@ -28,6 +29,8 @@
     "webpack-cli": "^3.3.6"
   },
   "dependencies": {
-    "preact": "^10.0.0-rc.3"
+    "preact": "^10.0.0-rc.3",
+    "rxjs": "^6.5.3",
+    "webpack-bundle-analyzer": "^3.5.0"
   }
 }

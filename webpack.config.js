@@ -1,10 +1,14 @@
 const path = require('path');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 
 const mode = process.argv.includes('--prod') ? 'production' : 'development'
 if (mode === 'production') {
     process.env.NODE_ENV="'production'"
 }
+
+const statsPlugin = process.argv.includes("--stats")
+  ? [new BundleAnalyzerPlugin()]
+  : []
 
 module.exports = {
     entry: path.join(__dirname, '/src/main.tsx'),
@@ -34,10 +38,10 @@ module.exports = {
             }
         ]
     },
+    plugins: [
+        ...statsPlugin
+    ],
     resolve: {
-        extensions: [".tsx", ".ts", ".js"],
-        plugins: [
-            new TsconfigPathsPlugin()
-        ]
+        extensions: [".tsx", ".ts", ".js"]
     },
 };

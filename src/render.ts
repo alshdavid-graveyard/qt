@@ -9,7 +9,7 @@ export class Initializer {
   }
 
   static attachTo(outlet: HTMLElement) {
-    const C = new this.component().render
+    const C = new this.component().render()
     render(h(C, {}), outlet)
   }
 }
