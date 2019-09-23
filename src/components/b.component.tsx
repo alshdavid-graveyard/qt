@@ -1,5 +1,4 @@
-import { h, Fragment } from 'preact';
-import { Component, Render } from '../kit'
+import { Component, Render } from '@pangular/core'
 import { AComponent } from './a.component'
 
 @Component({
@@ -7,7 +6,7 @@ import { AComponent } from './a.component'
   declarations: [
     AComponent
   ],
-  template: ({ ctx, declarations }) => 
+  template: ({ ctx, declarations, h, Fragment }) => 
     <Fragment>
       <Render 
         target={declarations['a-component']} 

@@ -13,7 +13,6 @@ const findInstanceFromRecord = <T = any>(
   collection: Record<string, any>, 
   object: new (...args: any[]) => T
 ): T | undefined => {
-  console.log('hi')
   for (const item in collection) {
     if (collection[item] instanceof object) {
       return collection[item]
@@ -23,6 +22,7 @@ const findInstanceFromRecord = <T = any>(
 type InjectProps = ((params: any) => any)
 export function Inject(exec: InjectProps | any) {
   return function (target: any, key: string) {  
+
     patchOnInit(target, async function(this: any) {
       const container: Container = this.container
       const useSelector = isConstructor(exec)

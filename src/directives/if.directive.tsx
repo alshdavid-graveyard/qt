@@ -1,4 +1,4 @@
-import { Directive, Input } from "../kit";
+import { Directive, Input } from "@pangular/core";
 
 @Directive({
   selector: 'if',

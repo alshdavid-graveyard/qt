@@ -1,9 +1,8 @@
-import { h, Fragment } from 'preact';
-import { Component, Input, Output, EventEmitter } from '../kit'
+import { Component, Input, Output, EventEmitter } from '@pangular/core'
 
 @Component({
   selector: 'a-component',
-  template: ({ ctx }) =>
+  template: ({ ctx, h, Fragment }) =>
     <Fragment>
       <h1>{ctx.someProp}</h1>
       <button

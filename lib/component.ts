@@ -1,9 +1,10 @@
 import { h } from 'preact'
 import { Container } from './container'
+import { patchAfterViewInit } from './patch-method'
 
 const ignoredMethods = [
   'constructor', 'onInit', 'onDestroy', 
-  'selector', 'render', 'container'
+  'selector', 'render', 'container', 'type'
 ]
 
 const getKeys = (instance: any, ctor: any) => {
@@ -23,14 +24,16 @@ const getKeys = (instance: any, ctor: any) => {
 const voidFn = () => () => {}
 
 interface TemplateProps {
-  ctx: Record<string, any>,
+  ctx: Record<string, any>
   declarations: Record<string, any>
+  h: any
+  Fragment: any
 }
 
 interface ComponentOptions {
   selector: string
   declarations?: any[]
-  template: (props: TemplateProps) => void
+  template: ((props: TemplateProps) => void) | string
 }
 
 export function Component(options: ComponentOptions) {
@@ -44,34 +47,38 @@ export function Component(options: ComponentOptions) {
       instance.selector = options.selector
 
       const onInit = instance.onInit || voidFn()
+      const afterViewInit = instance.afterViewInit || voidFn()
       const onDestroy = instance.onDestroy || voidFn()
 
-      container.onInit.subscribe(() => onInit.apply(instance))
-      container.onDestroy.subscribe(() => onDestroy.apply(instance))
+      container.onInit.subscribe(async () => {
+        await onInit.apply(instance)
 
-      container.setTemplate(options.template)
+        const instanceKeys = getKeys(instance, constructor)
+        const proxyValues = {}  
 
-      const instanceKeys = getKeys(instance, constructor)
-      const proxyValues = {}  
-
-      for (let key in instanceKeys) {
-        proxyValues[key] = instance[key]
-        if (proxyValues[key].bind) {
-          proxyValues[key] = proxyValues[key].bind(instance)
-        }
-        Object.defineProperty(instance, key, {
-          get: () => proxyValues[key],
-          set: newValue => {
-            proxyValues[key] = newValue
-            container.setContext({ 
-              ...proxyValues, 
-              [key]: newValue 
-            })
+        for (let key in instanceKeys) {
+          proxyValues[key] = instance[key]
+          if (proxyValues[key].bind) {
+            proxyValues[key] = proxyValues[key].bind(instance)
           }
-        })
-      }
+          Object.defineProperty(instance, key, {
+            get: () => proxyValues[key],
+            set: newValue => {
+              proxyValues[key] = newValue
+              container.setContext({ 
+                ...proxyValues, 
+                [key]: newValue 
+              })
+            }
+          })
+        }
 
-      container.setContext(proxyValues)
+        container.setContext(proxyValues)
+
+        container.setTemplate(options.template)
+        afterViewInit()
+      })
+      container.onDestroy.subscribe(() => onDestroy.apply(instance))
 
       const declarations = {}
       for (const Value of options.declarations || []) {
@@ -81,6 +88,7 @@ export function Component(options: ComponentOptions) {
       container.setDeclarations(declarations)
 
       instance.render = () => instance.container.getComponent()
+
       return instance
     }
 

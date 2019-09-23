@@ -1,15 +1,12 @@
-import { Initializer } from './kit';
-import { DComponent } from './components/d.component'
-import { PostService } from './service/posts.service'
+import { Initializer, Component } from '@pangular/core';
 
-const postService = new PostService()
+@Component({
+  selector: 'test',
+  template: ({ h }) => 
+    h('div', {}, 'Hello World')
+})
+class MyComponent {}
 
 Initializer
-  .useComponent(DComponent)
-  .provideKeys({
-    something: 'hey'
-  })
-  .provideInstances([
-    postService
-  ])
+  .useComponent(MyComponent)
   .attachTo(document.body)

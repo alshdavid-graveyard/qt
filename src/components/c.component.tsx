@@ -1,5 +1,4 @@
-import { h, Fragment } from 'preact';
-import { Component, Input, Output, EventEmitter, Render } from '../kit'
+import { Component, Input, Output, EventEmitter, Render } from '@pangular/core';
 import { For, If } from '../directives'
 
 @Component({
@@ -8,7 +7,7 @@ import { For, If } from '../directives'
     For, 
     If,
   ],
-  template: ({ ctx, declarations }) =>
+  template: ({ ctx, declarations, h, Fragment }) =>
     <Fragment>
       <div>Working</div>
       <Render 

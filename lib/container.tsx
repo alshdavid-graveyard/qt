@@ -1,7 +1,6 @@
-import { h, Fragment, Component } from 'preact'
-import { useEffect, useContext } from 'preact/hooks'
-import { dependencyContainer } from './injector'
 import { Subscription, BehaviorSubject, Subject } from 'rxjs'
+import { h, Fragment, Component, useEffect, useContext } from './runtime'
+import { dependencyContainer } from './injector'
 
 interface TemplateProps {
   template: BehaviorSubject<any>
@@ -51,24 +50,16 @@ class Template extends Component<TemplateProps, TemplateState> {
   setTemplate = (template: any) => {
     this.setState({ template })
   }
-
-  getComponent() {
-    if (!this.props.template.value) {
-      return h(Fragment, {})
-    }
-    return
-  }
   
   render() {
-    if (!this.state.template) {
-      return
-    }
     return h(Fragment, {},
       h(
         this.state.template, 
         { 
           ctx: this.state.context,
           declarations: this.state.declarations,
+          h,
+          Fragment
         }
       )
     )
@@ -76,7 +67,8 @@ class Template extends Component<TemplateProps, TemplateState> {
 }
 
 export class Container {
-  template = new BehaviorSubject<any>(<Fragment/>)
+  component: any
+  template = new BehaviorSubject<any>(() => <Fragment/>)
   context = new BehaviorSubject<any>({})
   declarations = new BehaviorSubject<any>({})
   props = new BehaviorSubject<any>({})  
