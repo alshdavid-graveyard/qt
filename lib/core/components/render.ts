@@ -1,4 +1,4 @@
-import { h } from "./runtime";
+import { h } from "preact";
 
 export interface RenderProps {
     target: () => any

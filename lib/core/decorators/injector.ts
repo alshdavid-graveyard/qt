@@ -1,9 +1,7 @@
-import { createContext } from 'preact'
 import { patchOnInit } from './patch-method'
 import { first, map } from 'rxjs/operators'
-import { Container } from './container';
+import { Container } from '../container';
 
-export const dependencyContainer = createContext<any>({})
 
 function isConstructor(obj) {
   return !!obj.prototype && !!obj.prototype.constructor.name;

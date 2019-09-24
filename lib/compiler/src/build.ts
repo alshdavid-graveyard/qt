@@ -1,6 +1,7 @@
 import { Writer } from './writer'
-import { ParseResult } from '../html-parse/parse'
+import { ParseResult } from './parser'
 import { HTMLTags } from './element-names'
+import { ComponentOptions, Container } from '@pangular/core'
 
 const templateRegex = new RegExp(/{{{?(#[a-z]+ )?[a-z]+.[a-z]*}?}}/g)
 const dataBindingRegex = new RegExp(/\[(#[a-z]+ )?[a-z]+.[a-z]*\]/g)
@@ -14,7 +15,7 @@ const replaceTemplates = (str: string) => {
   })
 }
 
-function attrString(OGAttrs: Record<string, string>, d: Record<string, string>) {
+function attrString(OGAttrs: Record<string, string>, c: Container) {
   const attrs = {...OGAttrs}
   if (Object.keys(attrs).length === 0) {
     return '{}'
@@ -51,13 +52,13 @@ function attrString(OGAttrs: Record<string, string>, d: Record<string, string>) 
   return '{ ' + buff.join(', ') + ' }';
 }
 
-const writeResult = (w: Writer, r: ParseResult, d: Record<string, string>) => {
+const writeResult = (w: Writer, r: ParseResult, c: Container) => {
   if (r.type === 'text') {
     w.write(`'${replaceTemplates(r.content!)}'`)
     return
   }
   
-  const attributes = attrString(r.attrs, d)
+  const attributes = attrString(r.attrs, c)
   if (r.name === 'Fragment' || r.name === 'pg-template') {
     w.write(`h(Fragment, {}, `)
   } else if (r.name === 'slot') {
@@ -66,11 +67,11 @@ const writeResult = (w: Writer, r: ParseResult, d: Record<string, string>) => {
   } else if (HTMLTags.includes(r.name!)) {
     w.write(`h('${r.name}', ${attributes}, `)
   } else {
-    w.write(`h(declarations['${r.name}'], ${attributes}, `)
+    w.write(`h(d('${r.name}'), ${attributes}, `)
   }
 
   for (let child of r.children || []) {
-    writeResult(w, child, d)
+    writeResult(w, child, c)
     w.write(", ")
   }
 
@@ -79,7 +80,7 @@ const writeResult = (w: Writer, r: ParseResult, d: Record<string, string>) => {
 
 export const build = (
   results: ParseResult[], 
-  declarations: Record<string, string>
+  container: Container
 ) => {
   const w = new Writer()
   let target: ParseResult
@@ -95,8 +96,8 @@ export const build = (
       children: results
     }
   }
-  writeResult(w, target)
+  writeResult(w, target, container)
   const compiled = w.get().replace(/\n/g, '')
-  const output = `({ h, Fragment, ctx, declarations, children, obtainRef }) => ${compiled}`
+  const output = `({ h, Fragment, ctx, d, children, obtainRef }) => ${compiled}`
   return output
 }

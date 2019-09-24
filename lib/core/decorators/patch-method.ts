@@ -29,6 +29,7 @@ export function patchOnDestroy(target: any, method: any) {
 
 export function patchConstructor(type = '', fn: (instance: any, constructor: any, ...args: any[]) => void) {
   return function(constructor: any): any {
+    
     function construct(...args: any[]) {
       const instance = new constructor(...args)
       return fn(instance, constructor, ...args)

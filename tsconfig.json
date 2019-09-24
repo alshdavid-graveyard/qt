@@ -17,8 +17,9 @@
     "jsxFactory": "h",
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "strictPropertyInitialization": false,
     "paths": {
-      "@pangular/core": ["lib/core/index"]
+      "@pangular/*": ["lib/*"]
     }
   },
   "exclude": [

@@ -41,6 +41,7 @@ module.exports = {
   resolve: {
     alias: {
       '@pangular/core': path.resolve(__dirname, 'lib/core'),
+      '@pangular/compiler': path.resolve(__dirname, 'lib/compiler'),
     },
     extensions: [".tsx", ".ts", ".js"]
   }

@@ -8,21 +8,21 @@ export interface ParseResult {
   name?: string,
   content?: string,
   voidElement: boolean,
-  attrs: Record<string, string>,
+  attrs: Record<string, any>,
   children: ParseResult[]
 }
 
 export function parse(html, options?): ParseResult[] {
   options || (options = {})
   options.components || (options.components = empty)
-  var result = []
-  var current
+  var result: any = []
+  var current: any
   var level = -1
-  var arr = []
+  var arr: any = []
   var byTag = {}
   var inComponent = false
 
-  html.replace(tagRE, function(tag, index) {
+  html.replace(tagRE, function (tag, index) {
     if (inComponent) {
       if (tag !== "</" + current.name + ">") {
         return

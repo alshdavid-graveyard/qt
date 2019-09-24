@@ -1,5 +1,5 @@
 import { h, Fragment, render, createContext } from 'preact'
-import { dependencyContainer } from './injector'
+import { DependencyContainer } from './components/context'
 
 const makeID = () => ((Math.random() * 10000000).toFixed(0)).toString()
 
@@ -25,10 +25,11 @@ export class Initializer {
   }
 
   static attachTo(outlet: HTMLElement) {
-    const C = new this.component().render()
+    const component = new this.component()
+    const C = component.render()
     if (this.state) {
       const app = h(
-        dependencyContainer.Provider as any, 
+        DependencyContainer.Provider as any, 
         { value: this.state }, 
         h(C, {})
       )
