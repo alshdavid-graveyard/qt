@@ -33,14 +33,14 @@ module.exports = {
   },
   plugins: [...statsPlugin],
   externals: {
-    'preact': 'preact',
-    'preact/hooks': 'preact/hooks',
-    'rxjs': 'rxjs',
-    'rxjs/operators': 'rxjs/operators'
+    // 'preact': 'preact',
+    // 'preact/hooks': 'preact/hooks',
+    // 'rxjs': 'rxjs',
+    // 'rxjs/operators': 'rxjs/operators'
   },
   resolve: {
     alias: {
-      '@pangular/core': path.resolve(__dirname, 'lib'),
+      '@pangular/core': path.resolve(__dirname, 'lib/core'),
     },
     extensions: [".tsx", ".ts", ".js"]
   }

@@ -19,7 +19,9 @@ const findInstanceFromRecord = <T = any>(
     }
   }
 }
+
 type InjectProps = ((params: any) => any)
+
 export function Inject(exec: InjectProps | any) {
   return function (target: any, key: string) {  
 

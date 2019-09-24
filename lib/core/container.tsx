@@ -3,7 +3,9 @@ import { h, Fragment, Component, useEffect, useContext } from './runtime'
 import { dependencyContainer } from './injector'
 
 interface TemplateProps {
+  children: any
   template: BehaviorSubject<any>
+  refs: BehaviorSubject<any>
   context: BehaviorSubject<any>
   declarations: BehaviorSubject<any>
   onInit: Subject<any>
@@ -47,6 +49,18 @@ class Template extends Component<TemplateProps, TemplateState> {
     this.props.onDestroy.complete()
   }
 
+  obtainRef = (name: string) => {
+    return (ref: HTMLElement | undefined) => {
+      if (!ref) {
+        return
+      }
+      this.props.refs.next({ 
+        ...this.props.refs.value, 
+        [name]: ref,
+      })
+    }
+  }
+
   setTemplate = (template: any) => {
     this.setState({ template })
   }
@@ -56,10 +70,12 @@ class Template extends Component<TemplateProps, TemplateState> {
       h(
         this.state.template, 
         { 
+          children: this.props.children,
           ctx: this.state.context,
           declarations: this.state.declarations,
           h,
-          Fragment
+          Fragment,
+          obtainRef: this.obtainRef,
         }
       )
     )
@@ -69,6 +85,7 @@ class Template extends Component<TemplateProps, TemplateState> {
 export class Container {
   component: any
   template = new BehaviorSubject<any>(() => <Fragment/>)
+  refs = new BehaviorSubject<any>({})
   context = new BehaviorSubject<any>({})
   declarations = new BehaviorSubject<any>({})
   props = new BehaviorSubject<any>({})  
@@ -126,6 +143,8 @@ export class Container {
       return h(
         Template, 
         { 
+          children: props.children,
+          refs: this.refs,
           template: this.template, 
           context: this.context,
           declarations: this.declarations,

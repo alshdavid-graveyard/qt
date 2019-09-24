@@ -10,7 +10,9 @@ export function Input(options: any = {}) {
         if (this[key] === update[key]) {
           return
         }
-        this[key] = update[key]
+        if (update[key]) {
+          this[key] = update[key]
+        }
       })
     })
 

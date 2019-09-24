@@ -18,7 +18,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "@pangular/core": ["lib/index"]
+      "@pangular/core": ["lib/core/index"]
     }
   },
   "exclude": [
