@@ -1,5 +1,5 @@
 import { Container } from '../container'
-import { voidFn } from 'legacy/lib/core/utils'
+import { voidFn } from '../utils'
 
 export const lifcycleMethods = {
   onInit: 'onInit',

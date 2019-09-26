@@ -3,7 +3,6 @@ import { h, render, Fragment, Component as PComponent } from 'preact'
 import { y, Container, Component, ObjectProxy } from '@pangular/core'
 import { Subscription } from 'rxjs'
 
-
 @Component({
   selector: 'something',
   template: ({ y, ctx }) => {
@@ -18,8 +17,6 @@ import { Subscription } from 'rxjs'
 class MyComponent {
   value = 'Hello'
 }
-
-
 
 const myComponent = new MyComponent()
 const C = (myComponent as any).render()
