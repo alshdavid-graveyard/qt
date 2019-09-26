@@ -1,6 +1,9 @@
-import { Container } from '../container'
-import { patchConstructor } from './patch-method'
-import { patchProperties, patchBasics } from '../class-patcher'
+import { Container, y } from '../container'
+import { patchConstructor } from './patches'
+import { patchBasics } from './patches'
+import { ObjectProxy } from '../object-proxy'
+import { h, Fragment, Component as PComponent } from 'preact'
+import { useSubscribe } from '@pangular/core'
 
 interface TemplateProps {
   ctx: Record<string, any>
@@ -15,41 +18,59 @@ export interface ComponentOptions {
   template: ((props: TemplateProps) => void) | string | any
 }
 
-const setTemplate = (
-  template: any, 
-  container: Container,
-) => {
-  if (
-    template.prototype && 
-    template.prototype.templateType === 'tagged-template'
-  ) {
-    template = template(container)
-  }
-  container.setTemplate(template)
+const Wrapper = ({ proxy, template }) => {
+  const pctx = useSubscribe(proxy.$proxy, proxy.dispenceProxy())
+
+  const ctx = proxy.dispenceProxy()
+  console.log(ctx)
+  return h(template, { ctx, y })
 }
 
 export function Component(options: ComponentOptions) {
-  return patchConstructor('component', (instance, constructor) => {
-    const container = new Container()
+  return patchConstructor('component', (instance) => {
+    const proxy = new ObjectProxy(instance, ['afterViewInit', 'onInit', 'onDestroy', 'container', 'render', 'selector'])
+    const C = () => h(Wrapper, { proxy, template: options.template })
+    const container = new Container(C)
+
+    instance.render = () => () => container.getComponent()
     const [ onInit, afterViewInit, onDestroy ] = patchBasics(instance, container, options)
 
-    container.onInit.subscribe(() => {
-      container.setDeclarations(options.declarations)
-      setTemplate(options.template, container)
-      patchProperties(instance, container, constructor)
+    container.$onInit.subscribe(() => {
       onInit.apply(instance)
-      container.renderTemplate()
     })
 
-    container.afterViewInit.subscribe(() => {
-      console.log(1)
+    container.$afterViewInit.subscribe(() => {
       afterViewInit.apply(instance)
     })
 
-    container.onDestroy.subscribe(() => {
+    container.$onDestroy.subscribe(() => {
       onDestroy.apply(instance)
     })
 
     return instance
   })
 }
+
+
+  //  class Wrapper extends PComponent<any, any> {
+  //   subscription: Subscription
+
+  //   state = {
+  //     ctx: this.props.proxy.dispenceProxy()
+  //   }
+
+  //   componentDidMount() {
+  //     this.subscription = this.props.proxy.$proxy.subscribe(ctx => {
+  //       console.log(ctx)
+  //       this.setState({ ctx })
+  //     })  
+  //   }
+
+  //   componentWillUnmount() {
+  //     this.subscription.unsubscribe()
+  //   }
+    
+  //   render() {
+  //     return h(this.props.template, { ctx: this.state.ctx, y })
+  //   }
+  // }

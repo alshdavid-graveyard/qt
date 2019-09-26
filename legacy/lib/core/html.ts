@@ -1,7 +1,8 @@
 import { compile } from '@pangular/compiler'
+import { Container } from '@pangular/core'
 
 export function html(string: TemplateStringsArray) {
-  function compiler(instance: Record<string, any>) {
+  function compiler(instance: Container) {
     const result = compile(string[0], instance)
     console.log(result)
     return eval(result)

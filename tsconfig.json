@@ -25,6 +25,7 @@
   "exclude": [
     "./webpack.config.js",
     "./node_modules",
-    "./public"
+    "./public",
+    "./legacy"
   ]
 }

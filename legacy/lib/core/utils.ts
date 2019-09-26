@@ -3,6 +3,23 @@ export const ignoredMethods = [
   'selector', 'render', 'container' 
 ]
 
+export const getKeys = (instance: any, ctor: any) => {
+  const methods = Object.getOwnPropertyNames(ctor.prototype)
+  const properties = Object.keys(instance)
+
+  // console.log('methods', methods)
+  // console.log(properties, 'properties')
+
+  const draft: any = {}
+  for (let key of [...methods, ...properties]) {
+    if (ignoredMethods.includes(key)) {
+      continue
+    }
+    draft[key] = instance[key]
+  }
+  return draft
+}
+
 export const voidFn = () => () => {}
 
 export function shallowClone(obj) {

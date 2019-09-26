@@ -1,1 +1,1 @@
-import './sandboxes/directive'
+import './sandboxes/b'
