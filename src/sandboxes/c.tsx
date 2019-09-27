@@ -3,16 +3,19 @@ import { h, render, Fragment, Component as PComponent } from 'preact'
 import { y, Container, Component, ObjectProxy, useSubscribe } from '@pangular/core'
 import { Subscription } from 'rxjs'
 
-interface TemplateProps {
-  ctx?: MyComponent
-  proxy: ObjectProxy
+
+function getContainer(ctrl: Container) {
+  console.log(ctrl)
+  ctrl.$props.next({ value: 'something else' })
 }
-const Template = ({ proxy }: TemplateProps) => {
-  const ctx = useSubscribe(proxy.$proxy, proxy.$value.getValue())
+
+const Template = ({ proxy }: any) => {
+  const ctx = useSubscribe(proxy.$proxy, proxy.dispenceProxy())
   
   return <div>
     <h1>{ctx.value}</h1>
     <input 
+      getContainer={getContainer}
       value={ctx.value} 
       onInput={(e: any) => ctx.value = e.target.value} />
       <button onClick={() => ctx.print()}>Click</button>
@@ -29,12 +32,12 @@ class MyComponent {
 
 const myComponent = new MyComponent()
 const proxy = new ObjectProxy(myComponent)
-const ctx = proxy.dispenceProxy()
 
-proxy.$value.subscribe(console.log)
+proxy.$value.subscribe(() => console.log('updated'))
 
-const C = () => <Fragment>
-  <Template ctx={ctx} proxy={proxy}/>
-</Fragment>
-
+const C = () => h(Template, { proxy }) 
 render(<C />, document.body)
+
+setTimeout(() => {
+
+})

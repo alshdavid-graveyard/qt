@@ -4,13 +4,13 @@ import { patchOnInit, patchAfterViewInit, patchOnDestroy } from "../patches"
 export interface HookContext {
   ctx: DecoratedComponent
   setProperty: (update: any) => void
-  getProperty: () => any
-  getPropertyKey: () => string
+  getPropertyValue: () => any
 }
 
 export type HookFn = (fn: ((hook: HookContext) => void)) => void
 
 export interface Hooks {
+  readonly key: string
   onInit: HookFn
   afterViewInit: HookFn
   onDestroy: HookFn
@@ -24,14 +24,14 @@ export const createPropertyDecorator = (fn: (a: Hooks) => void) => {
         const ctx: HookContext = { 
           ctx: this, 
           setProperty: (value) => this[key] = value,
-          getProperty: () => this[key],
-          getPropertyKey: () => key,
+          getPropertyValue: () => this[key],
         }
         update(ctx)
       })
     }
 
     const hooks: Hooks = {
+      key,
       onInit: u => onSomething(patchOnInit, u),
       afterViewInit: u => onSomething(patchAfterViewInit, u),
       onDestroy: u => onSomething(patchOnDestroy, u),

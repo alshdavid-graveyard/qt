@@ -20,7 +20,6 @@ export class ComponentWrapper extends Component<any, any> {
 
   getDeclaration = (name: string) => {
     const component = this.props.declarations[name]
-    console.log(this.props.declarations)
     if (!component) {
       throw new Error(`Component with tag "${name}" does not exist, did you forget to declare it?`)
     }
@@ -36,5 +35,6 @@ export class ComponentWrapper extends Component<any, any> {
   }
 }
 
-
-export const createComponentWrapper = (proxy, template, declarations) => () => h(ComponentWrapper, { proxy, template, declarations })
+export const createComponentWrapper = (
+  proxy, template, declarations
+) => () => h(ComponentWrapper, { proxy, template, declarations })

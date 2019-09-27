@@ -2,12 +2,10 @@
 import { h, render } from 'preact'
 import { y, Component, DecoratedComponent, Input, Output, EventEmitter } from '@pangular/core'
 
-
 @Component({
-  selector: 'something',
+  selector: 'b',
   template: ({ y, ctx, d }) => {
     return <div>
-      Hi, {ctx.aProp}
       <button 
         onClick={() => ctx.onSomething.next('hi')}>
         onSomething
@@ -15,12 +13,33 @@ import { y, Component, DecoratedComponent, Input, Output, EventEmitter } from '@
     </div>
   }
 })
-class MyComponent {
-  @Input()
-  aProp = 'original value'
-
+class B {
   @Output()
   onSomething = new EventEmitter()
+}
+
+const div = h('div', {}, 'ok')
+
+const b = new B() as DecoratedComponent<B>
+const V = (props) => {
+  console.log(props)
+  return b._render(props)
+}
+
+@Component({
+  selector: 'a',
+  template: ({ y, ctx, d }) => {
+    return <div>
+      Hi, {ctx.aProp}
+      { div }
+      <V onSomething={e => ctx.doSomething(e)} />
+    </div>
+  }
+})
+class MyComponent {
+  doSomething(v: string) {
+    console.log('yo!', v)
+  }
 }
 
 const myComponent = new MyComponent() as DecoratedComponent<MyComponent>

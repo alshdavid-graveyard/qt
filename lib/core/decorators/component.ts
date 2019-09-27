@@ -1,3 +1,4 @@
+import { h } from 'preact'
 import { Container, y } from '../container'
 import { reservedKeys } from './reserved-keys'
 import { createComponentWrapper } from '../components'
@@ -10,7 +11,7 @@ export type DecoratedComponent<T = {}> = ComponentRender & T
 
 export interface ComponentRender {
   _container: Container
-  _render: () => any
+  _render: (props?: any) => h.JSX.Element
 }
 
 export interface TemplateProps {

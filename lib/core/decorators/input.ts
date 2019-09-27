@@ -2,38 +2,17 @@ import { Subscription } from "rxjs";
 import { createPropertyDecorator } from './patches'
 
 export function Input() {
-  return createPropertyDecorator(({ onInit }) => {
+  return createPropertyDecorator(({ key, onInit, onDestroy }) => {
     let subscription: Subscription
 
-    onInit(({ setProperty }) => {
-      
+    onInit(({ ctx, setProperty }) => {
+      subscription = ctx._container.$props.subscribe(
+        (value) => setProperty(value[key])
+      )
     })
 
-
-
-    // onDestroy(ctx => {
-    //   subscription.unsubscribe()
-    // })
+    onDestroy(() => {
+      subscription.unsubscribe()
+    })
   })
 }
-
-
-  // return function (target: any, key: string) {
-  //   let $: Subscription
-
-  //   patchOnInit(target, function(this: DecoratedComponent) {
-  //     $ = this._container.props.subscribe(update => {
-  //       if (this[key] === update[key]) {
-  //         return
-  //       }
-  //       if (update[key]) {
-  //         this[key] = update[key]
-  //       }
-  //     })
-  //   })
-
-  //   patchOnDestroy(target, function(this: any) {
-  //     $.unsubscribe()
-  //   })
-  // }
-// }

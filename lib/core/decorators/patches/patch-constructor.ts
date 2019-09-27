@@ -1,5 +1,5 @@
 import { Container } from '../../container'
-import { voidFn } from '../../utils'
+import { voidFn } from '../../common'
 
 export function patchConstructor(type = '', fn: (instance: any, constructor: any, ...args: any[]) => void) {
   return function(constructor: any): any {
@@ -21,7 +21,7 @@ export const patchBasics = (
 ) => {
   container.selector = options.selector
   instance._container = container
-  instance._render = () => () => container.getComponent()
+  instance._render = (props: any) => container.getComponent(props)
   if (!instance.onInit) {
     instance.onInit = voidFn()
   }

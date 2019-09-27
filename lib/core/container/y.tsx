@@ -8,10 +8,15 @@ export function y(tag: any, props: Record<string, any> = {}, ...children: any) {
   if (!props) {
     props = {}
   }
+  let selectedChildren = children
   if (children.length && Array.isArray(children[0])) {
-    children = children[0]
+    selectedChildren = children[0]
   }
-  const directives = (props && props._directives) || []
-  const ctrl = new Container(tag, props, directives, children)
-  return ctrl.getComponent()
+  const directives = props._directives || []
+  const ctrl = new Container(tag, props, directives, selectedChildren)
+  if (props.getContainer) {
+    props.getContainer(ctrl)
+  }
+  props.getContainer = undefined
+  return ctrl.getComponent(props)
 }
