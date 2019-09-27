@@ -6,7 +6,7 @@ import { first } from 'rxjs/operators';
 export class Container {
     selector: string | undefined
     $lifecycle = new Subject<PreactLifeCycle>()
-    $template = new BehaviorSubject<any>({ tag: Fragment, children: [] })
+    $tag = new BehaviorSubject<any>(Fragment)
     $ref = new BehaviorSubject<HTMLElement | undefined>(undefined)
     $context = new BehaviorSubject<any>(undefined)
     $onInit = new Subject<void>()
@@ -26,10 +26,7 @@ export class Container {
         this.onComponentLifecycle(PreactLifeCycle.didMount).then(() => {
             this.$onInit.next()
             this.$onInit.complete()
-            this.$template.next({ 
-                tag: this.tag, 
-                children: this.children 
-            })
+            this.$tag.next(this.tag)
         })
         this.onComponentLifecycle(PreactLifeCycle.didUpdate).then(() => {
             this.$afterViewInit.next()
@@ -53,12 +50,12 @@ export class Container {
     getComponent() {
         const props = {
             $lifecycle: this.$lifecycle,
-            $template: this.$template,
+            $tag: this.$tag,
             $ref: this.$ref,
             $context: this.$context,
             forwardedProps: this.props
-        }
-        return h(Target, props)
+        }        
+        return h(Target, props, this.children)
         // h(Fragment,{}, [
         //     h(ContextAccessor, props),
         //     h(Target, props),

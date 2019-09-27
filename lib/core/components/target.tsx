@@ -14,8 +14,7 @@ export class Target extends Component<any, any> {
     }
 
     componentDidMount() {
-        this.props.$template.subscribe(({ tag, children }) => 
-            this.setState({ tag, children }))
+        this.props.$tag.subscribe((tag) => this.setState({ tag }))
         this.props.$lifecycle.next(PreactLifeCycle.didMount)
     }
 
@@ -39,7 +38,7 @@ export class Target extends Component<any, any> {
             // ref: this.getRef,
         }
         return (
-            h(this.state.tag, props, this.state.children)
+            h(this.state.tag, props, this.props.children)
         )
     }
 }

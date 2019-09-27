@@ -1,11 +1,19 @@
 import { Container, y } from '../container'
+import { reservedKeys } from './reserved-keys'
+import { createComponentWrapper } from '../components'
 import { patchConstructor } from './patches'
 import { patchBasics } from './patches'
 import { ObjectProxy } from '../object-proxy'
-import { h, Fragment, Component as PComponent } from 'preact'
-import { useSubscribe } from '@pangular/core'
+import { Subscription } from 'rxjs'
 
-interface TemplateProps {
+export type DecoratedComponent<T = {}> = ComponentRender & T
+
+export interface ComponentRender {
+  _container: Container
+  _render: () => any
+}
+
+export interface TemplateProps {
   ctx: Record<string, any>
   declarations: Record<string, any>
   h: any
@@ -18,59 +26,46 @@ export interface ComponentOptions {
   template: ((props: TemplateProps) => void) | string | any
 }
 
-const Wrapper = ({ proxy, template }) => {
-  const pctx = useSubscribe(proxy.$proxy, proxy.dispenceProxy())
-
-  const ctx = proxy.dispenceProxy()
-  console.log(ctx)
-  return h(template, { ctx, y })
+const initDeclarations = (declarations: any[] = []) => {
+  const result = {}
+  for (const Value of declarations) {
+    const value = new Value()
+    if (Value.prototype.type === 'directive') {
+      result[value._container.selector] = value
+    }
+    if (Value.prototype.type === 'component') {
+      result[value._container.selector] = value._render()
+    }
+  }
+  return result
 }
 
 export function Component(options: ComponentOptions) {
   return patchConstructor('component', (instance) => {
-    const proxy = new ObjectProxy(instance, ['afterViewInit', 'onInit', 'onDestroy', 'container', 'render', 'selector'])
-    const C = () => h(Wrapper, { proxy, template: options.template })
-    const container = new Container(C)
+    const subscription = new Subscription()
+    const proxy = new ObjectProxy(instance, reservedKeys)
+    const container = new Container()
+    const declarations = initDeclarations(options.declarations)
+    container.tag = createComponentWrapper(proxy, options.template, declarations)
+    const hooks = patchBasics(instance, container, options)
 
-    instance.render = () => () => container.getComponent()
-    const [ onInit, afterViewInit, onDestroy ] = patchBasics(instance, container, options)
+    const onInit = () => {
+      hooks.onInit()
+    }
 
-    container.$onInit.subscribe(() => {
-      onInit.apply(instance)
-    })
+    const afterViewInit = () => {
+      hooks.afterViewInit()
+    }
 
-    container.$afterViewInit.subscribe(() => {
-      afterViewInit.apply(instance)
-    })
+    const onDestroy = () => {
+      hooks.onDestroy()
+    }
 
-    container.$onDestroy.subscribe(() => {
-      onDestroy.apply(instance)
-    })
-
+    subscription.add(container.$onInit.subscribe(onInit))
+    subscription.add(container.$afterViewInit.subscribe(afterViewInit))
+    subscription.add(container.$onDestroy.subscribe(onDestroy))
     return instance
   })
 }
 
 
-  //  class Wrapper extends PComponent<any, any> {
-  //   subscription: Subscription
-
-  //   state = {
-  //     ctx: this.props.proxy.dispenceProxy()
-  //   }
-
-  //   componentDidMount() {
-  //     this.subscription = this.props.proxy.$proxy.subscribe(ctx => {
-  //       console.log(ctx)
-  //       this.setState({ ctx })
-  //     })  
-  //   }
-
-  //   componentWillUnmount() {
-  //     this.subscription.unsubscribe()
-  //   }
-    
-  //   render() {
-  //     return h(this.props.template, { ctx: this.state.ctx, y })
-  //   }
-  // }
