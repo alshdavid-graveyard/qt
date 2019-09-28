@@ -35,7 +35,7 @@ const initDeclarations = (declarations: any[] = []) => {
       result[value._container.selector] = value
     }
     if (Value.prototype.type === 'component') {
-      result[value._container.selector] = value._render()
+      result[value._container.selector] = (props) => value._render(props)
     }
   }
   return result

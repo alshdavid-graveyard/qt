@@ -3,10 +3,9 @@ import { h } from 'preact'
 
 export interface RenderProps {
     target: () => any
-    propss?: Record<any, any>
+    props?: Record<any, any>
 }
 
-export const Render = ({ target, propss = {} }: RenderProps) => {
-  console.log('ok', propss)
-  return h(target, { ...propss})
+export const Render = ({ target, props = {} }: RenderProps) => {
+  return h(target, { ...props })
 }

@@ -2,9 +2,6 @@ import { Container } from "./container"
 import { h } from "preact"
 
 export function y(tag: any, props: Record<string, any> = {}, ...children: any) {
-  // if (directives.length === 0) {
-  //     return h(tag, props, children)
-  // }
   if (!props) {
     props = {}
   }
@@ -13,6 +10,9 @@ export function y(tag: any, props: Record<string, any> = {}, ...children: any) {
     selectedChildren = children[0]
   }
   const directives = props._directives || []
+  // if (directives.length === 0) {
+  //   return h(tag, props, children)
+  // }
   const ctrl = new Container(tag, props, directives, selectedChildren)
   if (props.getContainer) {
     props.getContainer(ctrl)

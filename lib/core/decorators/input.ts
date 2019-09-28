@@ -5,9 +5,19 @@ export function Input() {
   return createPropertyDecorator(({ key, onInit, onDestroy }) => {
     let subscription: Subscription
 
-    onInit(({ ctx, setProperty }) => {
+    onInit(({ ctx, setProperty, getPropertyValue }) => {
       subscription = ctx._container.$props.subscribe(
-        (value) => setProperty(value[key])
+        (newValue) => {
+          const currentValue = getPropertyValue()
+          const update = newValue[key]
+          if (currentValue === update) {
+            return
+          }
+          if (!update) {
+            return
+          }
+          setProperty(update)
+        }
       )
     })
 

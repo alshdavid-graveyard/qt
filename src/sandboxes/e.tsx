@@ -6,6 +6,9 @@ import { y, Component, DecoratedComponent, Input, Output, EventEmitter } from '@
   selector: 'b',
   template: ({ y, ctx, d }) => {
     return <div>
+      <input 
+        type="text"
+        onInput={e =>ctx.onInput.next(e.target.value)}/>
       <button 
         onClick={() => ctx.onSomething.next('hi')}>
         onSomething
@@ -14,6 +17,9 @@ import { y, Component, DecoratedComponent, Input, Output, EventEmitter } from '@
   }
 })
 class B {
+  @Output()
+  onInput = new EventEmitter()
+
   @Output()
   onSomething = new EventEmitter()
 }
@@ -30,15 +36,20 @@ const V = (props) => {
   selector: 'a',
   template: ({ y, ctx, d }) => {
     return <div>
-      Hi, {ctx.aProp}
+      Hi, {ctx.update}
       { div }
-      <V onSomething={e => ctx.doSomething(e)} />
+      <V 
+        onSomething={e => ctx.doSomething(e)} 
+        onInput={v => ctx.doSomething(v)}/>
     </div>
   }
 })
 class MyComponent {
+  update = 'original'
+
   doSomething(v: string) {
     console.log('yo!', v)
+    this.update = v
   }
 }
 

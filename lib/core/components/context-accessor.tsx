@@ -1,12 +1,29 @@
-import { Component, h } from "preact";
+import { Component, h, Fragment } from "preact";
 import { DC } from "./context";
 
 export class ContextAccessor extends Component<any, any> {
-    render() {
-        return h(
-            DC.Consumer as any, 
-            {}, 
-            (context) => this.props.$context.next(context)
-        )
+  emitContext() {
+    if (this.props.$context.value === this.context) {
+      return
     }
+    this.props.$context.next(this.context)
+  }
+
+  componentDidMount() {
+    this.emitContext()
+  }
+
+  componentDidUpdate() {
+    this.emitContext()
+  }
+
+  componentWillUnmount() {
+    this.emitContext()
+  }
+
+  render() {
+    this.emitContext()
+    return <Fragment />
+  }
 }
+ContextAccessor.contextType = DC

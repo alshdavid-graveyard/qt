@@ -24,7 +24,12 @@ export class ObjectProxy {
 
   private defineProperty(target: any, key: any) {
     Object.defineProperty(target, key, {
-      get: () => this.proxy[key],
+      get: () => {
+        if (this.proxy[key] && this.proxy[key].apply) {
+          // this.proxy[key].bind(this.proxy)
+        }
+        return this.proxy[key]
+      },
       set: newValue => {
         const update = { ...this.proxy }
         update[key] = newValue

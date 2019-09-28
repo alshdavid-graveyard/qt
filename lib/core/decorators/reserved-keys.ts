@@ -1,1 +1,1 @@
-export const reservedKeys = ['afterViewInit', 'onInit', 'onDestroy', '_container', '_render']
+export const reservedKeys = ['_container', '_render']

@@ -8,6 +8,7 @@ export function Output() {
 
     onInit(({ ctx, getPropertyValue }) => {
       const value: EventEmitter = getPropertyValue()
+      
       subscription = value.subscribe(value => {
         ctx._container.emitOutput(key, value)
       })

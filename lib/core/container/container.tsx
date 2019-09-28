@@ -1,5 +1,5 @@
 import { BehaviorSubject, Subject } from "rxjs"
-import { PreactLifeCycle, Target } from "../components"
+import { PreactLifeCycle, Target, ContextAccessor } from "../components"
 import { h, Fragment } from "preact"
 import { first } from "rxjs/operators"
 
@@ -21,7 +21,6 @@ export class Container {
     public directives: any[] = [],
     public children: any[] = []
   ) {
-    // console.log(this.props.props)
     this.$props = new BehaviorSubject(this.props)
     for (const directive of this.directives) {
       this.applyDirective(directive)
@@ -56,9 +55,11 @@ export class Container {
     })
   }
 
-  getComponent(forwardedProps: Record<string, any> = {}) {
-    this.props = forwardedProps
-    this.$props.next(this.props)
+  getComponent(forwardedProps?: Record<string, any>) {
+    if (forwardedProps) {
+      this.props = forwardedProps
+      this.$props.next(this.props)
+    }
     const props = {
       $lifecycle: this.$lifecycle,
       $tag: this.$tag,
@@ -67,10 +68,10 @@ export class Container {
       $context: this.$context,
       forwardedProps: this.props
     }
-    return h(Target, props, this.children)
-    // h(Fragment,{}, [
-    //     h(ContextAccessor, props),
-    //     h(Target, props),
-    // ])
+    // return h(Target, props, this.children)
+    return h(Fragment,{}, [
+        h(ContextAccessor, props),
+        h(Target, props, this.children),
+    ])
   }
 }
