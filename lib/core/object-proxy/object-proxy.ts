@@ -13,8 +13,8 @@ export class ObjectProxy {
   ) {
     const keys = this.getClassKeys()
     for (let key of keys) {
-      this.proxy[key] = instance[key]
-      this.defineProperty(instance, key)
+      this.proxy[key] = this.instance[key]
+      this.defineProperty(this.instance, key)
     }
     this.$value = new BehaviorSubject(this.proxy)
     this.$proxy = this.$value.pipe(
@@ -22,14 +22,18 @@ export class ObjectProxy {
     )
   }
 
+  public addProperty(key: string, value: any) {
+    this.proxy[key] = value
+    this.instance[key] = value
+    this.defineProperty(this.instance, key)
+    const update = { ...this.proxy }
+    this.proxy = update
+    this.$value.next(this.proxy)
+  }
+
   private defineProperty(target: any, key: any) {
     Object.defineProperty(target, key, {
-      get: () => {
-        if (this.proxy[key] && this.proxy[key].apply) {
-          // this.proxy[key].bind(this.proxy)
-        }
-        return this.proxy[key]
-      },
+      get: () => this.proxy[key],
       set: newValue => {
         const update = { ...this.proxy }
         update[key] = newValue
@@ -40,6 +44,7 @@ export class ObjectProxy {
   }
 
   private getClassKeys(): string[] {
+    
     const items = [
       ...Object.getOwnPropertyNames(this.instance.constructor.prototype),
       ...Object.getOwnPropertyNames(this.instance),

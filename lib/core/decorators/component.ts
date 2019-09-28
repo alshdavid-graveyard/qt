@@ -12,6 +12,7 @@ export type DecoratedComponent<T = {}> = ComponentRender & T
 export interface ComponentRender {
   _container: Container
   _render: (props?: any) => h.JSX.Element
+  _objectProxy: ObjectProxy
 }
 
 export interface TemplateProps {
@@ -48,7 +49,7 @@ export function Component(options: ComponentOptions) {
     const container = new Container()
     const declarations = initDeclarations(options.declarations)
     container.tag = createComponentWrapper(proxy, options.template, declarations)
-    const hooks = patchBasics(instance, container, options)
+    const hooks = patchBasics(instance, container, options, proxy)
 
     const onInit = () => {
       hooks.onInit()

@@ -1,5 +1,6 @@
 import { Container } from '../../container'
 import { voidFn } from '../../common'
+import { ObjectProxy } from '@pangular/core/object-proxy'
 
 export function patchConstructor(type = '', fn: (instance: any, constructor: any, ...args: any[]) => void) {
   return function(constructor: any): any {
@@ -17,9 +18,11 @@ export function patchConstructor(type = '', fn: (instance: any, constructor: any
 export const patchBasics = (
   instance: any,
   container: Container,
-  options: any
+  options: any,
+  objectProxy: ObjectProxy
 ) => {
   container.selector = options.selector
+  instance._objectProxy = objectProxy
   instance._container = container
   instance._render = (props: any) => container.getComponent(props)
   if (!instance.onInit) {

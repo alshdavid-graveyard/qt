@@ -1,14 +1,21 @@
 import { ObjectProxy } from '@pangular/core'
 
 class A {
-  value = 'start'
+  // value = 'start'
+  something: any
 
-  thing() {
-    console.log(this.value)
-  }
+  // thing() {
+  //   console.log(this.value)
+  // }
 }
-const instnace = new A()
-const proxy = new ObjectProxy(instnace)
+const instance = new A()
+const proxy = new ObjectProxy(instance)
 const ctx = proxy.dispenceProxy()
 
-ctx.thing()
+proxy.$proxy.subscribe(proxy => {
+  console.log(proxy)
+})
+
+proxy.addProperty('something', 'value')
+
+// console.log(instance)

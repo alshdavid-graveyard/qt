@@ -1,4 +1,4 @@
-import { DecoratedComponent } from "../component"
+import { DecoratedComponent, ComponentRender } from "../component"
 import { patchOnInit, patchAfterViewInit, patchOnDestroy } from "../patches"
 
 export interface HookContext {
@@ -20,10 +20,15 @@ export const createPropertyDecorator = (fn: (a: Hooks) => void) => {
   return function (target: any, key: string) {
 
     const onSomething = (something: any, update: any) => {
-      something(target, function(this: any) {
+      something(target, function(this: ComponentRender) {
         const ctx: HookContext = { 
           ctx: this, 
-          setProperty: (value) => this[key] = value,
+          setProperty: (value) => {
+            if (!this[key]) {
+              this._objectProxy.addProperty(key, value)
+            }
+            this[key] = value
+          },
           getPropertyValue: () => this[key],
         }
         update(ctx)
