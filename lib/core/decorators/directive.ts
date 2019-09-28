@@ -1,9 +1,14 @@
-class Directive {
-    selector = 'print'
-    ref: HTMLElement
+import { patchConstructor } from "./patches"
 
-    afterViewInit() {
-        // this.ref.addEventListener('click', () => console.log('hey'))
-        console.log(this.ref)
-    }
+export interface DirectiveOptions {
+  attribute: string
+}
+
+export function Directive(options: DirectiveOptions) {
+  return patchConstructor('directive', (instance) => {
+    instance._attribute = options.attribute
+    instance._objectProxy
+    instance._container
+    return instance
+  })
 }

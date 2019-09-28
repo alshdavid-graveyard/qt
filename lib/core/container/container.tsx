@@ -34,7 +34,9 @@ export class Container {
       this.$afterViewInit.next()
       this.$afterViewInit.complete()
     })
-    this.$ref.pipe(first(e => e !== undefined)).subscribe(el => {})
+    this.$ref.pipe(first(e => e !== undefined)).subscribe(el => {
+      
+    })
   }
 
   emitOutput(key: string, value: any) {
@@ -49,13 +51,21 @@ export class Container {
   }
 
   applyDirective(directive) {
-    this.$afterViewInit.subscribe(() => {
+    directive._container = this
+    this.$onInit.subscribe(() => {
+      directive.onInit && directive.onInit()
+    })
+    this.$afterViewInit.subscribe(async () => {
+      await this.$ref.pipe(first(e => e !== undefined)).toPromise()
       directive.ref = this.$ref.getValue()
-      directive.afterViewInit()
+      directive.afterViewInit && directive.afterViewInit()
     })
   }
 
-  getComponent(forwardedProps?: Record<string, any>) {
+  getComponent(
+    forwardedProps?: Record<string, any>,
+    forwardedChidlren?: any,
+  ) {
     if (forwardedProps) {
       this.props = forwardedProps
       this.$props.next(this.props)
@@ -66,9 +76,10 @@ export class Container {
       $ref: this.$ref,
       $props: this.$props,
       $context: this.$context,
-      forwardedProps: this.props
+      forwardedProps: this.props,
+      forwardedChidlren,
     }
-    // return h(Target, props, this.children)
+    return h(Target, props)
     return h(Fragment,{}, [
         h(ContextAccessor, props),
         h(Target, props, this.children),

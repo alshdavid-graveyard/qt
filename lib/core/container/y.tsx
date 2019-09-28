@@ -1,5 +1,25 @@
 import { Container } from "./container"
-import { h } from "preact"
+import { h, Component, Fragment } from "preact"
+
+class State extends Component<any, any> {
+  ctrl = new Container(
+    this.props.tag, 
+    this.props.props, 
+    this.props.directives, 
+    this.props.selectedChildren
+  )
+
+  render() {
+    if (!this.ctrl) {
+      return h(Fragment, {})
+    }
+    return this.ctrl.getComponent(
+      this.props.props, 
+      this.props.selectedChildren
+    )
+  }
+}
+
 
 export function y(tag: any, props: Record<string, any> = {}, ...children: any) {
   if (!props) {
@@ -10,13 +30,11 @@ export function y(tag: any, props: Record<string, any> = {}, ...children: any) {
     selectedChildren = children[0]
   }
   const directives = props._directives || []
-  // if (directives.length === 0) {
-  //   return h(tag, props, children)
-  // }
-  const ctrl = new Container(tag, props, directives, selectedChildren)
-  if (props.getContainer) {
-    props.getContainer(ctrl)
+  const settings = {
+    tag,
+    props,
+    directives,
+    selectedChildren,
   }
-  props.getContainer = undefined
-  return ctrl.getComponent(props)
+  return h(State, settings)
 }

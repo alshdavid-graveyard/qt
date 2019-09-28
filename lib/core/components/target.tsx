@@ -36,9 +36,14 @@ export class Target extends Component<any, any> {
   }
 
   render() {
+    const props = {
+      ...this.props.$props.value,
+      ref: el => this.getRef(el)
+    }
     return h(
       this.state.tag, 
-      this.props.$props.value, 
-      this.props.children)
+      props, 
+      this.props.forwardedChidlren
+    )
   }
 }

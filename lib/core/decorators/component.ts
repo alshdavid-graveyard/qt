@@ -28,12 +28,14 @@ export interface ComponentOptions {
   template: ((props: TemplateProps) => void) | string | any
 }
 
-const initDeclarations = (declarations: any[] = []) => {
+const initDeclarations = (declarations: any[] = [], proxy: ObjectProxy, container: Container) => {
   const result = {}
   for (const Value of declarations) {
     const value = new Value()
     if (Value.prototype.type === 'directive') {
-      result[value._container.selector] = value
+      value._objectProxy = proxy
+      value._container = container
+      result[value._attribute] = value
     }
     if (Value.prototype.type === 'component') {
       result[value._container.selector] = (props) => value._render(props)
@@ -47,7 +49,7 @@ export function Component(options: ComponentOptions) {
     const subscription = new Subscription()
     const proxy = new ObjectProxy(instance, reservedKeys)
     const container = new Container()
-    const declarations = initDeclarations(options.declarations)
+    const declarations = initDeclarations(options.declarations, proxy, container)
     container.tag = createComponentWrapper(proxy, options.template, declarations)
     const hooks = patchBasics(instance, container, options, proxy)
 
