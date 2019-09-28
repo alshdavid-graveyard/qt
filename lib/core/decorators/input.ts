@@ -13,9 +13,6 @@ export function Input() {
           if (currentValue === update) {
             return
           }
-          if (!update) {
-            return
-          }
           setProperty(update)
         }
       )

@@ -23,12 +23,13 @@ export class ObjectProxy {
   }
 
   public addProperty(key: string, value: any) {
-    this.proxy[key] = value
-    this.instance[key] = value
-    this.defineProperty(this.instance, key)
-    const update = { ...this.proxy }
-    this.proxy = update
-    this.$value.next(this.proxy)
+    // console.log(Object.getOwnPropertyDescriptor(this.instance, key))
+    // this.proxy[key] = value
+    // this.instance[key] = value
+    // this.defineProperty(this.instance, key)
+    // const update = { ...this.proxy }
+    // this.proxy = update
+    // this.$value.next(this.proxy)
   }
 
   private defineProperty(target: any, key: any) {

@@ -6,6 +6,7 @@ import { patchConstructor } from './patches'
 import { patchBasics } from './patches'
 import { ObjectProxy } from '../object-proxy'
 import { Subscription } from 'rxjs'
+import { Initializer } from '../initializer'
 
 export type DecoratedComponent<T = {}> = ComponentRender & T
 
@@ -45,7 +46,7 @@ const initDeclarations = (declarations: any[] = [], proxy: ObjectProxy, containe
 }
 
 export function Component(options: ComponentOptions) {
-  return patchConstructor('component', (instance) => {
+  return patchConstructor('component', (instance, constructor) => {
     const subscription = new Subscription()
     const proxy = new ObjectProxy(instance, reservedKeys)
     const container = new Container()

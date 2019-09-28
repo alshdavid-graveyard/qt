@@ -1,1 +1,1 @@
-import './sandboxes/j'
+import './sandboxes/directive/my-component'
